@@ -7,19 +7,22 @@ import (
 	"github.com/poeticalcode/gworkflow/internal/engine/model"
 )
 
-// 流程相关服务
+// ProcessService 流程相关服务
 type ProcessService struct{}
 
-// 通过 XML 文件配置一条流程
-func (p ProcessService) DeployByXML(xmlData []byte, createBy string) error {
-	if xmlData != nil {
+// DeployByXML 通过 XML 文件配置一条流程
+func (w ProcessService) DeployByXML(xmlData []byte, createBy string) error {
+	if xmlData == nil {
 		panic(errors.New("xml 数据不能为空"))
 	}
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(xmlData); err != nil {
 		panic(err)
 	}
-	p.parseModelXML(doc)
+	_, err := w.parseModelXML(doc)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -27,7 +30,9 @@ func (p ProcessService) DeployByXML(xmlData []byte, createBy string) error {
 func (w ProcessService) parseModelXML(doc *etree.Document) (*model.ProcessModel, error) {
 	// 获取流程节点
 	root := doc.Root()
-	process := &model.ProcessModel{}
+	process := &model.ProcessModel{
+		Nodes: []model.NodeModel{},
+	}
 	// 流程的 ID
 	process.ID = root.SelectAttrValue(model.ATTR_ID, "")
 	// 流程显示名称
@@ -37,7 +42,9 @@ func (w ProcessService) parseModelXML(doc *etree.Document) (*model.ProcessModel,
 	// 流程节点下的所有子节点均需要转为节点模型
 	for _, e := range root.ChildElements() {
 		nodeModel := parseNodelModelXML(e)
-		process.Nodes = append(process.Nodes, *nodeModel)
+		if nodeModel != nil {
+			process.Nodes = append(process.Nodes, *nodeModel)
+		}
 	}
 	return nil, nil
 }
