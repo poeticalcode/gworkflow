@@ -22,6 +22,18 @@ type baseParser struct {
 func (b baseParser) Parse(e *etree.Element) *model.NodeModel {
 	b.model.DisplayName = e.SelectAttrValue(model.ATTR_DISPLAYNAME, "")
 	b.model.ID = e.SelectAttrValue(model.ATTR_ID, "")
+	// 遍历节点下的转移节点
+	for _, el := range e.ChildElements() {
+		if el.Tag == "transfer" {
+			transfer := model.TransferModel{}
+			transfer.ID = el.SelectAttrValue(model.ATTR_ID, "")
+			transfer.DisplayName = el.SelectAttrValue(model.ATTR_DISPLAYNAME, "")
+			transfer.NextId = el.SelectAttrValue(model.ATTR_NEXT_ID, "")
+			transfer.ID = el.SelectAttrValue(model.ATTR_ID, "")
+			transfer.Source = b.model
+			b.model.Outputs = append(b.model.Outputs, transfer)
+		}
+	}
 	// 自定义解析
 	return b.model
 }

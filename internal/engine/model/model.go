@@ -16,7 +16,7 @@ const (
 	ATTR_ASSIGNEE_HANDLER = "assignmentHandler"
 	ATTR_PERFORMTYPE      = "performType"
 	ATTR_TASKTYPE         = "taskType"
-	ATTR_TO               = "to"
+	ATTR_NEXT_ID          = "nextId"
 	ATTR_PROCESSNAME      = "processName"
 	ATTR_VERSION          = "version"
 	ATTR_EXPIRETIME       = "expireTime"
