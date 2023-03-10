@@ -33,7 +33,7 @@ func (w ProcessService) parseModelXML(doc *etree.Document) (*model.ProcessModel,
 	// 获取流程节点
 	root := doc.Root()
 	process := &model.ProcessModel{
-		Nodes: []model.NodeModel{},
+		Nodes: []*model.NodeModel{},
 	}
 	// 流程的 ID
 	process.ID = root.SelectAttrValue(model.ATTR_ID, "")
@@ -43,9 +43,19 @@ func (w ProcessService) parseModelXML(doc *etree.Document) (*model.ProcessModel,
 	process.DisplayName = root.SelectAttrValue(model.ATTR_EXPIRETIME, "")
 	// 流程节点下的所有子节点均需要转为节点模型
 	for _, e := range root.ChildElements() {
-		nodeModel := parseNodelModelXML(e)
-		if nodeModel != nil {
-			process.Nodes = append(process.Nodes, *nodeModel)
+		nodeModel, _ := parseNodelModelXML(e)
+		process.Nodes = append(process.Nodes, nodeModel)
+	}
+
+	// 遍历所有节点的输出节点，补全 inputs , target
+	for _, node := range process.Nodes {
+		for _, out := range node.Outputs {
+			for _, node2 := range process.Nodes {
+				if node2.ID == out.ID {
+					node2.Inputs = append(node2.Inputs, out)
+					out.Target = node2
+				}
+			}
 		}
 	}
 	fmt.Println(process)
@@ -53,8 +63,11 @@ func (w ProcessService) parseModelXML(doc *etree.Document) (*model.ProcessModel,
 }
 
 // 将传入的 xml 元素转为节点模型
-func parseNodelModelXML(e *etree.Element) *model.NodeModel {
-	// var parser.NodePa p = parser.NodeParser{}
-	var p parser.NodeParser = parser.StartParser{}
-	return p.Parse(e)
+func parseNodelModelXML(e *etree.Element) (*model.NodeModel, error) {
+	// 根据节点名称获取节点解析器
+	var p, err = parser.GetParser(e.Tag)
+	if err != nil {
+		return nil, err
+	}
+	return p.Parse(e), nil
 }

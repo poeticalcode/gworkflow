@@ -4,5 +4,5 @@ package model
 type ProcessModel struct {
 	BaseModel
 	// 流程中所有的节点
-	Nodes []NodeModel
+	Nodes []*NodeModel
 }
