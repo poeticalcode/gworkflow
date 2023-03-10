@@ -44,4 +44,6 @@ type BaseModel struct {
 // 节点模型
 type NodeModel struct {
 	BaseModel
+	Inputs  []TransferModel
+	Outputs []TransferModel
 }

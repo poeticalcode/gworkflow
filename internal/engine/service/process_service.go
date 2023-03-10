@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/beevik/etree"
 	"github.com/poeticalcode/gworkflow/internal/engine/model"
+	"github.com/poeticalcode/gworkflow/internal/engine/model/parser"
 )
 
 // ProcessService 流程相关服务
@@ -46,11 +48,13 @@ func (w ProcessService) parseModelXML(doc *etree.Document) (*model.ProcessModel,
 			process.Nodes = append(process.Nodes, *nodeModel)
 		}
 	}
+	fmt.Println(process)
 	return nil, nil
 }
 
 // 将传入的 xml 元素转为节点模型
 func parseNodelModelXML(e *etree.Element) *model.NodeModel {
-
-	return nil
+	// var parser.NodePa p = parser.NodeParser{}
+	var p parser.NodeParser = parser.StartParser{}
+	return p.Parse(e)
 }

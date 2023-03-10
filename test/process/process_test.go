@@ -1,10 +1,11 @@
-package process
+package process_test
 
 import (
-	"github.com/poeticalcode/gworkflow/internal/engine"
 	"io"
 	"os"
 	"testing"
+
+	"github.com/poeticalcode/gworkflow/internal/engine"
 )
 
 // TestProcessDeploy 测试引擎发布
